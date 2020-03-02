@@ -1,8 +1,4 @@
-﻿// <copyright company="Aranda Software">
-// © Todos los derechos reservados
-// </copyright>
-
-using IronWebScraper;
+﻿using IronWebScraper;
 
 namespace Cricarba.StoryTellerPL
 {

@@ -1,8 +1,4 @@
-﻿// <copyright company="Aranda Software">
-// © Todos los derechos reservados
-// </copyright>
-
-namespace Cricarba.StoryTellerPL
+﻿namespace Cricarba.StoryTellerPL
 {
     internal class TwitAuthenticateResponse
     {
