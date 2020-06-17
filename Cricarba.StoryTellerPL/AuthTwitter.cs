@@ -10,74 +10,7 @@ namespace Cricarba.StoryTellerPL
 {
     internal static class Twitter
     {
-        //internal void Auth(out TwitAuthenticateResponse twitAuthResponse)
-        //{
-        //    // You need to set your own keys and screen name
-        //    var oAuthConsumerKey = "YRHwZvpHlTPynGCGRjQ28l5yg";
-        //    var oAuthConsumerSecret = "DTV30wAeMrETIX46le2RIbgYvSWGeXAxx6lI6UGmGMzf1XbrxP";
-        //    var oAuthUrl = "https://api.twitter.com/oauth2/token";
-
-        //    // Do the Authenticate
-        //    var authHeaderFormat = "Basic {0}";
-
-        //    var authHeader = string.Format(authHeaderFormat,
-        //        Convert.ToBase64String(Encoding.UTF8.GetBytes(Uri.EscapeDataString(oAuthConsumerKey) + ":" +
-        //        Uri.EscapeDataString((oAuthConsumerSecret)))
-        //    ));
-
-        //    var postBody = "grant_type=client_credentials";
-
-        //    HttpWebRequest authRequest = (HttpWebRequest)WebRequest.Create(oAuthUrl);
-        //    authRequest.Headers.Add("Authorization", authHeader);
-        //    authRequest.Method = "POST";
-        //    authRequest.ContentType = "application/x-www-form-urlencoded;charset=UTF-8";
-        //    authRequest.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-
-        //    using (Stream stream = authRequest.GetRequestStream())
-        //    {
-        //        byte[] content = ASCIIEncoding.ASCII.GetBytes(postBody);
-        //        stream.Write(content, 0, content.Length);
-        //    }
-
-        //    authRequest.Headers.Add("Accept-Encoding", "gzip");
-
-        //    WebResponse authResponse = authRequest.GetResponse();
-        //    using (authResponse)
-        //    {
-        //        using (var reader = new StreamReader(authResponse.GetResponseStream()))
-        //        {
-        //            var objectText = reader.ReadToEnd();
-        //            twitAuthResponse = JsonConvert.DeserializeObject<TwitAuthenticateResponse>(objectText);
-        //        }
-        //    }
-        //}
-
-        //internal void NewTweet(TwitAuthenticateResponse twitAuthResponse, string tweet)
-        //{
-        //    string timelineUrl = $"https://api.twitter.com/1.1/statuses/update.json";
-        //    string timelineHeaderFormat = "{0} {1}";
-        //    HttpWebRequest a = (HttpWebRequest)WebRequest.Create(timelineUrl);
-        //    a.Headers.Add("Authorization", string.Format(timelineHeaderFormat, twitAuthResponse.token_type, twitAuthResponse.access_token));
-        //    a.Method = "Post";
-        //    a.Method = "Post";
-        //    a.ContentType = "application/x-www-form-urlencoded";
-        //    using (Stream objStream = a.GetRequestStream())
-        //    {
-        //        byte[] content = ASCIIEncoding.ASCII.GetBytes("status=" + Uri.EscapeDataString(tweet));
-        //        objStream.Write(content, 0, content.Length);
-        //    }
-        //    WebResponse aResponse = a.GetResponse();
-        //    var timeLineJson = string.Empty;
-
-        //    using (aResponse)
-        //    {
-        //        using (var reader = new StreamReader(aResponse.GetResponseStream()))
-        //        {
-        //            timeLineJson = reader.ReadToEnd();
-        //            //var result = Tweets.FromJson(timeLineJson);
-        //        }
-        //    }
-        //}
+       
         public static void Tweet(string message)
         {
             string twitterURL = "https://api.twitter.com/1.1/statuses/update.json";

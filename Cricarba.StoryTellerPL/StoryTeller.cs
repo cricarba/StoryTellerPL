@@ -17,39 +17,41 @@ namespace Cricarba.StoryTellerPL
         [TearDown]
         public void closeBrowser()
         {
-            driver.Close();
+           
         }
 
         [SetUp]
         public void startBrowser()
         {
             var path = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            var pathChromeDriver = path.Replace("Cricarba.StoryTellerPL.exe", "");
-            driver = new ChromeDriver(pathChromeDriver);
+            //var pathChromeDriver = path.Replace("Cricarba.StoryTellerPL.exe", "");
+            
         }
 
         [Test]
         public void StoryTellerTest()
         {
-            int timeMatch = 1;
+            int timeMatch = 0;
             while (timeMatch <= 46)
             {
-                driver.Url = "https://www.premierleague.com/match/46718";
-                Thread.Sleep(5000);
-                IWebElement element = driver.FindElement(By.CssSelector(".commentaryContainer"));
-                IWebElement tweet = driver.FindElement(By.CssSelector(".tweet"));
-                IWebElement hashTag = tweet.FindElement(By.TagName("strong"));
-
-                IWebElement teamHome = driver.FindElement(By.CssSelector(".team.home .teamName .long"));
-                IWebElement teamAway = driver.FindElement(By.CssSelector(".team.away .teamName .long"));
-                IWebElement score = driver.FindElement(By.CssSelector(".matchScoreContainer .centre .score.fullTime"));
-                IReadOnlyCollection<IWebElement> links = element.FindElements(By.TagName("li"));
-
-                if (links.Any())
+                var chromeDriver = @"C:\Users\Freddy Castelblanco\Documents\Archivos\Proyectos\StoryTellerPL\Cricarba.StoryTellerPL\";
+                driver = new ChromeDriver(chromeDriver);
+                driver.Url = "https://www.premierleague.com/match/46885";
+                Thread.Sleep(4000);
+                               
+                try
                 {
-                    var line = links.Skip(1).Take(1).First();
-                    try
+                    IWebElement element = driver.FindElement(By.CssSelector(".commentaryContainer"));
+                    IWebElement tweet = driver.FindElement(By.CssSelector(".tweet"));
+                    IWebElement hashTag = tweet.FindElement(By.TagName("strong"));
+
+                    IWebElement teamHome = driver.FindElement(By.CssSelector(".team.home .teamName .long"));
+                    IWebElement teamAway = driver.FindElement(By.CssSelector(".team.away .teamName .long"));
+                    IWebElement score = driver.FindElement(By.CssSelector(".matchScoreContainer .centre .score"));
+                    IReadOnlyCollection<IWebElement> links = element.FindElements(By.TagName("li"));
+                    if (links.Any())
                     {
+                        var line = links.First();
                         IWebElement card = line.FindElement(By.CssSelector(".blogCard"));
                         IWebElement time = card.FindElement(By.CssSelector(".cardMeta time"));
                         IWebElement cardContent = card.FindElement(By.CssSelector(".cardContent"));
@@ -62,13 +64,15 @@ namespace Cricarba.StoryTellerPL
                         tweetTemplate = tweetTemplate.Replace("/n", System.Environment.NewLine);
                         Twitter.Tweet(tweetTemplate);
                         timeMatch++;
-                        Thread.Sleep(50000);
-                    }
-                    catch (System.Exception ex)
-                    {
+                        driver.Close();
                         Thread.Sleep(50000);
                     }
                 }
+                catch (System.Exception ex)
+                {
+                    Thread.Sleep(50000);
+                }
+
             }
 
 
