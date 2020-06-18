@@ -26,42 +26,65 @@ namespace Cricarba.StoryTellerPL
                 PhotoMatch(matchId);
         }
 
-        private static void SummaryMatch(int numero)
+        private static void SummaryMatch(int id)
         {
             int timeMatch = 0;
             List<string> previousTweets = new List<string>();
-            IWebDriver driver;
             while (timeMatch <= 46)
-            {
-                var chromeDriver = @"C:\Users\Freddy Castelblanco\Documents\Archivos\Proyectos\StoryTellerPL\Cricarba.StoryTellerPL\";
-                driver = new ChromeDriver(chromeDriver);
-                try
+            {                
+                string tweetTemplate = GetTempalte(id);
+                if (!string.IsNullOrEmpty(tweetTemplate) && !previousTweets.Contains(tweetTemplate))
                 {
-                    driver.Url = $"https://www.premierleague.com/match/{numero}";
-                    Thread.Sleep(5000);
-                    IWebElement element = driver.FindElement(By.CssSelector(".commentaryContainer"));
-                    IWebElement tweet = driver.FindElement(By.CssSelector(".tweet"));
-                    IWebElement hashTag = tweet.FindElement(By.TagName("strong"));
-                    IWebElement teamHome = driver.FindElement(By.CssSelector(".team.home .teamName .long"));
-                    IWebElement teamAway = driver.FindElement(By.CssSelector(".team.away .teamName .long"));
-                    IWebElement score = driver.FindElement(By.CssSelector(".matchScoreContainer .centre .score"));
-                    IReadOnlyCollection<IWebElement> links = element.FindElements(By.TagName("li"));
-                    if (links.Any())
-                    {
-                        var line = links.First();
-                        Twitear(previousTweets, line, hashTag, teamHome, teamAway, score);
-                        timeMatch++;
-                        driver.Close();
-                        Thread.Sleep(30000);
-                    }
+                    previousTweets.Add(tweetTemplate);
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Twitter.Tweet(tweetTemplate);
+                    Console.Write(tweetTemplate);
+                    timeMatch++;
                 }
-                catch (Exception ex)
+                else
                 {
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    Console.Write("\n Tweet Repetido");
+                     
+                }
+                
+                Console.Write($"\n {timeMatch}");
+                Thread.Sleep(15000);
+            }
+        }
+        private static string GetTempalte(int numero)
+        {
+
+            string template = string.Empty;
+            IWebDriver driver;
+
+            var chromeDriver = @"C:\Users\Freddy Castelblanco\Documents\Archivos\Proyectos\StoryTellerPL\Cricarba.StoryTellerPL\";
+            driver = new ChromeDriver(chromeDriver);
+            try
+            {
+                driver.Url = $"https://www.premierleague.com/match/{numero}";
+                Thread.Sleep(5000);
+                IWebElement element = driver.FindElement(By.CssSelector(".commentaryContainer"));
+                IWebElement tweet = driver.FindElement(By.CssSelector(".tweet"));
+                IWebElement hashTag = tweet.FindElement(By.TagName("strong"));
+                IWebElement teamHome = driver.FindElement(By.CssSelector(".team.home .teamName .long"));
+                IWebElement teamAway = driver.FindElement(By.CssSelector(".team.away .teamName .long"));
+                IWebElement score = driver.FindElement(By.CssSelector(".matchScoreContainer .centre .score"));
+                IReadOnlyCollection<IWebElement> links = element.FindElements(By.TagName("li"));
+                if (links.Any())
+                {
+                    var line = links.First();
+                    template = CreateTemplate(line, hashTag, teamHome, teamAway, score);
                     driver.Close();
-                    Console.Write(ex.Message);
-                    Thread.Sleep(40000);
                 }
             }
+            catch (Exception ex)
+            {
+                driver.Close();
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write(ex.Message);
+            }
+            return template;
         }
 
         private static void PhotoMatch(int numero)
@@ -71,7 +94,6 @@ namespace Cricarba.StoryTellerPL
             driver = new ChromeDriver(chromeDriver);
             try
             {
-
                 driver.Url = $"https://www.premierleague.com/match/{numero}";
                 Thread.Sleep(10000);
                 bool staleElement = true;
@@ -85,9 +107,9 @@ namespace Cricarba.StoryTellerPL
                         if (gallery.Any())
                         {
                             var photo = gallery.First();
-
                             var url = photo.GetAttribute("data-ui-src");
-                            TweetImage(url);
+                            string tweetTemplate = GetTempalte(numero);
+                            TweetImage(url, tweetTemplate);
                             driver.Close();
                             Thread.Sleep(30000);
                         }
@@ -101,12 +123,14 @@ namespace Cricarba.StoryTellerPL
             }
             catch (Exception ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write(ex.Message);
                 driver.Close();
                 Thread.Sleep(30000);
             }
 
         }
-        private static void Twitear(List<string> previousTweets, IWebElement line, IWebElement hashTag, IWebElement teamHome, IWebElement teamAway, IWebElement score)
+        private static string CreateTemplate(IWebElement line, IWebElement hashTag, IWebElement teamHome, IWebElement teamAway, IWebElement score)
         {
             string timeMatch = string.Empty;
             IWebElement card = line.FindElement(By.CssSelector(".blogCard"));
@@ -123,30 +147,24 @@ namespace Cricarba.StoryTellerPL
             IWebElement innerContent = cardContent.FindElement(By.CssSelector(".innerContent"));
             IWebElement type = innerContent.FindElement(By.TagName("h6"));
             IWebElement text = innerContent.FindElement(By.TagName("p"));
-            if (!previousTweets.Contains(text.Text))
-            {
-                previousTweets.Add(text.Text);
-                string tweetTemplate = string.IsNullOrEmpty(type.Text) ? $"{hashTag.Text} /n /n⚽ {teamHome.Text} {score.Text} {teamAway.Text} /n /n🕕 {timeMatch}  /n /n🎙️ {text.Text} /n /n#PremierLeague" :
-                                                                   $"{hashTag.Text} /n /n⚽ {teamHome.Text} {score.Text} {teamAway.Text} /n /n🕕 {timeMatch}  /n /n🎙️ {type.Text} {text.Text} /n /n#PremierLeague";
-                tweetTemplate = tweetTemplate.Replace("/n", Environment.NewLine);
 
-                Console.Write(tweetTemplate);
-                Twitter.Tweet(tweetTemplate);
-            }
+            
+            string tweetTemplate = string.IsNullOrEmpty(type.Text) ? $"{hashTag.Text} /n /n⚽ {teamHome.Text} {score.Text} {teamAway.Text} /n /n🕕 {timeMatch}  /n /n🎙️ {text.Text} /n /n#PremierLeague #PL" :
+                                                               $"{hashTag.Text} /n /n⚽ {teamHome.Text} {score.Text} {teamAway.Text} /n /n🕕 {timeMatch}  /n /n🎙️ {type.Text} {text.Text} /n /n#PremierLeague #PL";
+            tweetTemplate = tweetTemplate.Replace("/n", Environment.NewLine);
+            return tweetTemplate;
+
+
         }
 
-        private static void TweetImage(string url)
+        private static void TweetImage(string url, string tweetTemplate)
         {
-
-
             try
             {
                 System.Net.HttpWebRequest webRequest = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(url);
                 webRequest.AllowWriteStreamBuffering = true;
                 webRequest.Timeout = 30000;
-
                 System.Net.WebResponse webResponse = webRequest.GetResponse();
-
                 System.IO.Stream stream = webResponse.GetResponseStream();
                 byte[] buffer = new byte[16 * 1024];
                 using (MemoryStream ms = new MemoryStream())
@@ -161,7 +179,7 @@ namespace Cricarba.StoryTellerPL
 
                     var media = Upload.UploadBinary(file1);
 
-                    var tweet = Tweet.PublishTweet("#PremierLeague", new PublishTweetOptionalParameters
+                    var tweet = Tweet.PublishTweet(tweetTemplate, new PublishTweetOptionalParameters
                     {
                         Medias = new List<IMedia> { media }
                     });
@@ -171,7 +189,8 @@ namespace Cricarba.StoryTellerPL
             }
             catch (Exception ex)
             {
-
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write(ex.Message);
             }
         }
     }
