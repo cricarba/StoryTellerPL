@@ -28,7 +28,7 @@ namespace Cricarba.StoryTellerPL
             List<string> previousTweets = new List<string>();
             List<string> previousPhotos = new List<string>();
 
-            while (timeMatch <= 49)
+            while (timeMatch <= 120)
             {
                 List<Tuple<string, string>> tweets = GetTempalte(id);
                 List<string> photos = GetPhotoMatch(id);
