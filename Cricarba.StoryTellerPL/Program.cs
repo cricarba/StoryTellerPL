@@ -18,44 +18,68 @@ namespace Cricarba.StoryTellerPL
             Console.Write("Numero del partido:");
             var numero = Console.ReadLine();
             int matchId = int.Parse(numero);
-            Console.Write("1.Paritdo \n2.Imagen \n");
-            var opcion = Console.ReadLine();
-            if (opcion == "1")
-                SummaryMatch(matchId);
-            else
-                PhotoMatch(matchId);
+            SummaryMatch(matchId);
+
         }
 
         private static void SummaryMatch(int id)
         {
             int timeMatch = 0;
             List<string> previousTweets = new List<string>();
-            while (timeMatch <= 46)
-            {                
-                string tweetTemplate = GetTempalte(id);
-                if (!string.IsNullOrEmpty(tweetTemplate) && !previousTweets.Contains(tweetTemplate))
+            List<string> previousPhotos = new List<string>();
+
+            while (timeMatch <= 120)
+            {
+                List<Tuple<string, string>> tweets = GetTempalte(id);
+                List<string> photos = GetPhotoMatch(id);
+                bool hasPhot = false;
+                string url = string.Empty;
+
+                foreach (var tweetTemplate in tweets.OrderByDescending(x => x.Item1))
                 {
-                    previousTweets.Add(tweetTemplate);
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Twitter.Tweet(tweetTemplate);
-                    Console.Write(tweetTemplate);
-                    timeMatch++;
+                    if (!string.IsNullOrEmpty(tweetTemplate.Item2) && !previousTweets.Contains(tweetTemplate.Item2))
+                    {
+                        previousTweets.Add(tweetTemplate.Item2);
+
+                        foreach (var photo in photos)
+                        {
+                            if (!previousPhotos.Contains(photo))
+                            {
+                                hasPhot = true;
+                                url = photo;
+                                previousPhotos.Add(photo);
+                                break;
+                            }
+                            
+                        }
+
+                        Console.ForegroundColor = ConsoleColor.White;
+                        if (hasPhot) { 
+                            TweetImage(url, tweetTemplate.Item2);
+                            hasPhot = false;
+                            url = string.Empty;
+                        }
+                        else
+                            Twitter.Tweet(tweetTemplate.Item2);
+
+                        Console.Write(tweetTemplate);
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkYellow;
+                        Console.Write("\n Tweet Repetido");
+                    }
                 }
-                else
-                {
-                    Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    Console.Write("\n Tweet Repetido");
-                     
-                }
-                
                 Console.Write($"\n {timeMatch}");
+                timeMatch++;
                 Thread.Sleep(15000);
             }
+            Console.Write("\n Fin tiempo");
         }
-        private static string GetTempalte(int numero)
+        private static List<Tuple<string, string>> GetTempalte(int numero)
         {
 
-            string template = string.Empty;
+            List<Tuple<string, string>> template = new List<Tuple<string, string>>();
             IWebDriver driver;
 
             var chromeDriver = @"C:\Users\Freddy Castelblanco\Documents\Archivos\Proyectos\StoryTellerPL\Cricarba.StoryTellerPL\";
@@ -73,8 +97,12 @@ namespace Cricarba.StoryTellerPL
                 IReadOnlyCollection<IWebElement> links = element.FindElements(By.TagName("li"));
                 if (links.Any())
                 {
-                    var line = links.First();
-                    template = CreateTemplate(line, hashTag, teamHome, teamAway, score);
+                    int take = links.Count > 3 ? 3 : 1;
+                    var lines = links.Take(take);
+                    foreach (var item in lines)
+                    {
+                        template.Add(CreateTemplate(item, hashTag, teamHome, teamAway, score));
+                    }
                     driver.Close();
                 }
             }
@@ -87,11 +115,12 @@ namespace Cricarba.StoryTellerPL
             return template;
         }
 
-        private static void PhotoMatch(int numero)
+        private static List<string> GetPhotoMatch(int numero)
         {
             var chromeDriver = @"C:\Users\Freddy Castelblanco\Documents\Archivos\Proyectos\StoryTellerPL\Cricarba.StoryTellerPL\";
             IWebDriver driver;
             driver = new ChromeDriver(chromeDriver);
+            List<string> urls = new List<string>();
             try
             {
                 driver.Url = $"https://www.premierleague.com/match/{numero}";
@@ -106,14 +135,13 @@ namespace Cricarba.StoryTellerPL
 
                         if (gallery.Any())
                         {
-                            var photo = gallery.First();
-                            var url = photo.GetAttribute("data-ui-src");
-                            string tweetTemplate = GetTempalte(numero);
-                            TweetImage(url, tweetTemplate);
-                            driver.Close();
-                            Thread.Sleep(30000);
+                            foreach (var photo in gallery)
+                            {
+                                urls.Add(photo.GetAttribute("data-ui-src"));
+                            }
                         }
                         staleElement = false;
+                        driver.Close();
                     }
                     catch (StaleElementReferenceException e)
                     {
@@ -126,13 +154,13 @@ namespace Cricarba.StoryTellerPL
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.Write(ex.Message);
                 driver.Close();
-                Thread.Sleep(30000);
             }
-
+            return urls;
         }
-        private static string CreateTemplate(IWebElement line, IWebElement hashTag, IWebElement teamHome, IWebElement teamAway, IWebElement score)
+        private static Tuple<string, string> CreateTemplate(IWebElement line, IWebElement hashTag, IWebElement teamHome, IWebElement teamAway, IWebElement score)
         {
-            string timeMatch = string.Empty;
+
+            string timeMatch = "--";
             IWebElement card = line.FindElement(By.CssSelector(".blogCard"));
             try
             {
@@ -148,13 +176,11 @@ namespace Cricarba.StoryTellerPL
             IWebElement type = innerContent.FindElement(By.TagName("h6"));
             IWebElement text = innerContent.FindElement(By.TagName("p"));
 
-            
+
             string tweetTemplate = string.IsNullOrEmpty(type.Text) ? $"{hashTag.Text} /n /n⚽ {teamHome.Text} {score.Text} {teamAway.Text} /n /n🕕 {timeMatch}  /n /n🎙️ {text.Text} /n /n#PremierLeague #PL" :
                                                                $"{hashTag.Text} /n /n⚽ {teamHome.Text} {score.Text} {teamAway.Text} /n /n🕕 {timeMatch}  /n /n🎙️ {type.Text} {text.Text} /n /n#PremierLeague #PL";
             tweetTemplate = tweetTemplate.Replace("/n", Environment.NewLine);
-            return tweetTemplate;
-
-
+            return Tuple.Create(timeMatch, tweetTemplate);
         }
 
         private static void TweetImage(string url, string tweetTemplate)
