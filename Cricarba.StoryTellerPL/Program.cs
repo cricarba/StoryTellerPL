@@ -1,4 +1,6 @@
-﻿using OpenQA.Selenium;
+﻿using Cricarba.StoryTellerPL.Core;
+using Cricarba.StoryTellerPL.Dto;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using System;
 using System.Collections.Generic;
@@ -15,7 +17,7 @@ namespace Cricarba.StoryTellerPL
     {
         private static void Main(string[] args)
         {
-            Console.Write("Numero del partido:");
+            Console.Write("Id del partido:");
             var numero = Console.ReadLine();
             int matchId = int.Parse(numero);
             SummaryMatch(matchId);
@@ -24,165 +26,53 @@ namespace Cricarba.StoryTellerPL
 
         private static void SummaryMatch(int id)
         {
-            int timeMatch = 0;
             List<string> previousTweets = new List<string>();
-            List<string> previousPhotos = new List<string>();
+            bool isEndTime = false;
+            bool isHalfTime = false;
 
-            while (timeMatch <= 120)
+            PremierLeague premierLeague = new PremierLeague();
+            while (!isEndTime)
             {
-                List<Tuple<string, string>> tweets = GetTempalte(id);
-                List<string> photos = GetPhotoMatch(id);
-                bool hasPhot = false;
-                string url = string.Empty;
-
-                foreach (var tweetTemplate in tweets.OrderByDescending(x => x.Item1))
+                List<TweetST> tweets = premierLeague.GetTweets(id).ToList();
+                foreach (var tweetTemplate in tweets.OrderByDescending(x => x.Time))
                 {
-                    if (!string.IsNullOrEmpty(tweetTemplate.Item2) && !previousTweets.Contains(tweetTemplate.Item2))
+                    if (!string.IsNullOrEmpty(tweetTemplate.Template) && !previousTweets.Contains(tweetTemplate.Template))
                     {
-                        previousTweets.Add(tweetTemplate.Item2);
-
-                        foreach (var photo in photos)
-                        {
-                            if (!previousPhotos.Contains(photo))
-                            {
-                                hasPhot = true;
-                                url = photo;
-                                previousPhotos.Add(photo);
-                                break;
-                            }
-                            
-                        }
+                        previousTweets.Add(tweetTemplate.Template);
 
                         Console.ForegroundColor = ConsoleColor.White;
-                        if (hasPhot) { 
-                            TweetImage(url, tweetTemplate.Item2);
-                            hasPhot = false;
-                            url = string.Empty;
-                        }
+                        if (tweetTemplate.HasImage) 
+                            TweetImage(tweetTemplate.Image, tweetTemplate.Template);
                         else
-                            Twitter.Tweet(tweetTemplate.Item2);
+                            Twitter.Tweet(tweetTemplate.Template);
 
-                        Console.Write(tweetTemplate);
+                        Console.Write(tweetTemplate.Template);
                     }
                     else
                     {
                         Console.ForegroundColor = ConsoleColor.DarkYellow;
                         Console.Write("\n Tweet Repetido");
                     }
-                }
-                Console.Write($"\n {timeMatch}");
-                timeMatch++;
-                Thread.Sleep(15000);
-            }
-            Console.Write("\n Fin tiempo");
-        }
-        private static List<Tuple<string, string>> GetTempalte(int numero)
-        {
 
-            List<Tuple<string, string>> template = new List<Tuple<string, string>>();
-            IWebDriver driver;
-
-            var chromeDriver = @"C:\Users\Freddy Castelblanco\Documents\Archivos\Proyectos\StoryTellerPL\Cricarba.StoryTellerPL\";
-            driver = new ChromeDriver(chromeDriver);
-            try
-            {
-                driver.Url = $"https://www.premierleague.com/match/{numero}";
-                Thread.Sleep(5000);
-                IWebElement element = driver.FindElement(By.CssSelector(".commentaryContainer"));
-                IWebElement tweet = driver.FindElement(By.CssSelector(".tweet"));
-                IWebElement hashTag = tweet.FindElement(By.TagName("strong"));
-                IWebElement teamHome = driver.FindElement(By.CssSelector(".team.home .teamName .long"));
-                IWebElement teamAway = driver.FindElement(By.CssSelector(".team.away .teamName .long"));
-                IWebElement score = driver.FindElement(By.CssSelector(".matchScoreContainer .centre .score"));
-                IReadOnlyCollection<IWebElement> links = element.FindElements(By.TagName("li"));
-                if (links.Any())
-                {
-                    int take = links.Count > 3 ? 3 : 1;
-                    var lines = links.Take(take);
-                    foreach (var item in lines)
+                    if (tweetTemplate.IsEndTime)
                     {
-                        template.Add(CreateTemplate(item, hashTag, teamHome, teamAway, score));
+                        isEndTime = true;
+                        break;
                     }
-                    driver.Close();
-                }
-            }
-            catch (Exception ex)
-            {
-                driver.Close();
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write(ex.Message);
-            }
-            return template;
-        }
 
-        private static List<string> GetPhotoMatch(int numero)
-        {
-            var chromeDriver = @"C:\Users\Freddy Castelblanco\Documents\Archivos\Proyectos\StoryTellerPL\Cricarba.StoryTellerPL\";
-            IWebDriver driver;
-            driver = new ChromeDriver(chromeDriver);
-            List<string> urls = new List<string>();
-            try
-            {
-                driver.Url = $"https://www.premierleague.com/match/{numero}";
-                Thread.Sleep(10000);
-                bool staleElement = true;
-                while (staleElement)
-                {
-                    try
+                    if (tweetTemplate.IsHalfTime)
                     {
-                        IWebElement element = driver.FindElement(By.CssSelector(".matchPhotoContainer"));
-                        IReadOnlyCollection<IWebElement> gallery = element.FindElements(By.TagName("li"));
-
-                        if (gallery.Any())
-                        {
-                            foreach (var photo in gallery)
-                            {
-                                urls.Add(photo.GetAttribute("data-ui-src"));
-                            }
-                        }
-                        staleElement = false;
-                        driver.Close();
-                    }
-                    catch (StaleElementReferenceException e)
-                    {
-                        staleElement = true;
+                        isHalfTime = true;
+                        break;
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write(ex.Message);
-                driver.Close();
-            }
-            return urls;
-        }
-        private static Tuple<string, string> CreateTemplate(IWebElement line, IWebElement hashTag, IWebElement teamHome, IWebElement teamAway, IWebElement score)
-        {
-
-            string timeMatch = "--";
-            IWebElement card = line.FindElement(By.CssSelector(".blogCard"));
-            try
-            {
-                IWebElement time = card.FindElement(By.CssSelector(".cardMeta time"));
-                timeMatch = time.Text;
-            }
-            catch (Exception)
-            {
+                Thread.Sleep(isHalfTime ? 900000 : 15000);
             }
 
-            IWebElement cardContent = card.FindElement(By.CssSelector(".cardContent"));
-            IWebElement innerContent = cardContent.FindElement(By.CssSelector(".innerContent"));
-            IWebElement type = innerContent.FindElement(By.TagName("h6"));
-            IWebElement text = innerContent.FindElement(By.TagName("p"));
-
-
-            string tweetTemplate = string.IsNullOrEmpty(type.Text) ? $"{hashTag.Text} /n /n⚽ {teamHome.Text} {score.Text} {teamAway.Text} /n /n🕕 {timeMatch}  /n /n🎙️ {text.Text} /n /n#PremierLeague #PL" :
-                                                               $"{hashTag.Text} /n /n⚽ {teamHome.Text} {score.Text} {teamAway.Text} /n /n🕕 {timeMatch}  /n /n🎙️ {type.Text} {text.Text} /n /n#PremierLeague #PL";
-            tweetTemplate = tweetTemplate.Replace("/n", Environment.NewLine);
-            return Tuple.Create(timeMatch, tweetTemplate);
+            Console.Write("\n Fin Partido");
         }
 
+      
         private static void TweetImage(string url, string tweetTemplate)
         {
             try

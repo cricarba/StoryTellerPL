@@ -153,10 +153,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuthTwitter.cs" />
-    <Compile Include="MatchScrapper.cs" />
+    <Compile Include="Core\PremierLeague.cs" />
+    <Compile Include="Dto\TweetST.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StoryTeller.cs" />
     <Compile Include="TwitAuthenticateResponse.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -179,6 +179,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
