@@ -10,7 +10,7 @@ using OpenQA.Selenium.Chrome;
 
 namespace Cricarba.StoryTellerPL.Core
 {
-    internal class PremierLeague
+    internal class PremierLeagueScrapper
     {
         List<string> previousPhotos = new List<string>();
         public IEnumerable<TweetST> GetTweets(int matchId)
