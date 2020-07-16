@@ -12,7 +12,6 @@ namespace Cricarba.StoryTellerPL.Core
 {
     public static class PremierTeller
     {
-
         public static void SummaryMatch(int id)
         {
             List<string> previousTweets = new List<string>();
@@ -23,7 +22,7 @@ namespace Cricarba.StoryTellerPL.Core
             while (!isEndTime)
             {
                 List<TweetST> tweets = premierLeague.GetTweets(id).ToList();
-                foreach (var tweetTemplate in tweets.OrderByDescending(x => x.Time))
+                foreach (var tweetTemplate in tweets.OrderBy(x => x.Time))
                 {
                     if (!string.IsNullOrEmpty(tweetTemplate.Template) && !previousTweets.Contains(tweetTemplate.Template))
                     {
@@ -55,7 +54,7 @@ namespace Cricarba.StoryTellerPL.Core
                         break;
                     }
                 }
-                Thread.Sleep(isHalfTime ? 900000 : 15000);
+                Thread.Sleep(isHalfTime ? 1200000 : 15000);
             }
 
             Console.Write("\n Fin Partido");

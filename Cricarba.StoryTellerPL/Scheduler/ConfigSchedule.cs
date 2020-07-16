@@ -18,7 +18,7 @@ namespace Cricarba.StoryTellerPL.Scheduler
         public void RunServer() {
             using (var server = new BackgroundJobServer())
             {
-                Console.WriteLine("Server Run");
+
                 Console.ReadLine();
             }
         }

@@ -59,7 +59,6 @@ namespace Cricarba.StoryTellerPL.Core
             }
             return template;
         }
-
         private static TweetST CreateTemplate(IWebElement line, IWebDriver driver)
         {
 
@@ -96,7 +95,6 @@ namespace Cricarba.StoryTellerPL.Core
 
             return newTweet;
         }
-
         private static int GetTime(string timeMatch)
         {
             int time;
@@ -114,7 +112,6 @@ namespace Cricarba.StoryTellerPL.Core
 
             return time;
         }
-
         private static List<string> GetPhotoMatch(IWebDriver driver)
         {
 
