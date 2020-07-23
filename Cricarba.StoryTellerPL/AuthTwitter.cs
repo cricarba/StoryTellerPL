@@ -8,19 +8,16 @@ using System.Text;
 
 namespace Cricarba.StoryTellerPL
 {
-    internal static class Twitter
+    internal class TwitterD
     {
-       
-        public static void Tweet(string message)
+        private readonly TwiteerAuth _twitAuthenticate;
+        public TwitterD(TwiteerAuth twitAuthenticate)
+        {
+            _twitAuthenticate = twitAuthenticate;
+        }
+        public void Tweet(string message)
         {
             string twitterURL = "https://api.twitter.com/1.1/statuses/update.json";
-
-            string oauth_consumer_key = "S3pq2lpVO9A34AhVLqwqtKY9e";
-            string oauth_consumer_secret = "gImHjaJVsaO9qY7BSCTDH293lz6uHscDSZgILlYj9BhvdS1Hjf";
-            string oauth_token = "1234320497179086848-LRb0PjLZu2dhht2IHW2tM8KCYZPkRB";
-            string oauth_token_secret = "8q2cDGRMYHHTYlIsbSG2H0BaIAdBA4a1b0OgQgC8C67GQ";
-
-            // set the oauth version and signature method
             string oauth_version = "1.0";
             string oauth_signature_method = "HMAC-SHA1";
 
@@ -34,16 +31,16 @@ namespace Cricarba.StoryTellerPL
 
             string baseString = string.Format(
                 baseFormat,
-                oauth_consumer_key,
+                _twitAuthenticate.ConsumerKey,
                 oauth_nonce,
                 oauth_signature_method,
-                oauth_timestamp, oauth_token,
+                oauth_timestamp, _twitAuthenticate.Token,
                 oauth_version,
                 Uri.EscapeDataString(message)
             );
 
             string oauth_signature = null;
-            using (HMACSHA1 hasher = new HMACSHA1(ASCIIEncoding.ASCII.GetBytes(Uri.EscapeDataString(oauth_consumer_secret) + "&" + Uri.EscapeDataString(oauth_token_secret))))
+            using (HMACSHA1 hasher = new HMACSHA1(ASCIIEncoding.ASCII.GetBytes(Uri.EscapeDataString(_twitAuthenticate.ConsumerSecret) + "&" + Uri.EscapeDataString(_twitAuthenticate.TokenSecret))))
             {
                 oauth_signature = Convert.ToBase64String(hasher.ComputeHash(ASCIIEncoding.ASCII.GetBytes("POST&" + Uri.EscapeDataString(twitterURL) + "&" + Uri.EscapeDataString(baseString))));
             }
@@ -53,12 +50,12 @@ namespace Cricarba.StoryTellerPL
 
             string authorizationHeader = string.Format(
                 authorizationFormat,
-                Uri.EscapeDataString(oauth_consumer_key),
+                Uri.EscapeDataString(_twitAuthenticate.ConsumerKey),
                 Uri.EscapeDataString(oauth_nonce),
                 Uri.EscapeDataString(oauth_signature),
                 Uri.EscapeDataString(oauth_signature_method),
                 Uri.EscapeDataString(oauth_timestamp),
-                Uri.EscapeDataString(oauth_token),
+                Uri.EscapeDataString(_twitAuthenticate.Token),
                 Uri.EscapeDataString(oauth_version)
             );
 
