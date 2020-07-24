@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.IO;
 using Cricarba.StoryTellerPL.Dto;
 using System.Threading;
-using Tweetinvi;
-using Tweetinvi.Models;
-using Tweetinvi.Parameters;
+
 
 namespace Cricarba.StoryTellerPL.Core
 {
