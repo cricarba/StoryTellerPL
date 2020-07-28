@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Cricarba.StoryTellerPL.Dto;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
@@ -12,12 +10,11 @@ namespace Cricarba.StoryTellerPL.Core
 {
     internal class PremierLeague
     {
-        List<string> previousPhotos = new List<string>();
+        List<string> _previousPhotos = new List<string>();
         public IEnumerable<TweetST> GetTweets(int matchId)
         {
             List<TweetST> template = new List<TweetST>();
             IWebDriver driver;
-
             var chromeDriver = @"C:\Users\Freddy Castelblanco\Documents\Archivos\Proyectos\StoryTellerPL\Cricarba.StoryTellerPL\";
             driver = new ChromeDriver(chromeDriver);
             try
@@ -26,7 +23,6 @@ namespace Cricarba.StoryTellerPL.Core
                 Thread.Sleep(5000);
                 IWebElement element = driver.FindElement(By.CssSelector(".commentaryContainer"));
                 IReadOnlyCollection<IWebElement> links = element.FindElements(By.TagName("li"));
-
 
                 List<string> photos = GetPhotoMatch(driver);
                 if (links.Any())
@@ -38,11 +34,11 @@ namespace Cricarba.StoryTellerPL.Core
                         var newTweet = CreateTemplate(item, driver);
                         foreach (var photo in photos)
                         {
-                            if (!previousPhotos.Contains(photo))
+                            if (!_previousPhotos.Contains(photo))
                             {
                                 newTweet.HasImage = true;
                                 newTweet.Image = photo;
-                                previousPhotos.Add(photo);
+                                _previousPhotos.Add(photo);
                                 break;
                             }
                         }
@@ -62,17 +58,15 @@ namespace Cricarba.StoryTellerPL.Core
 
         private static TweetST CreateTemplate(IWebElement line, IWebDriver driver)
         {
-
             string timeMatch = "--";
             TweetST newTweet = new TweetST();
-
             IWebElement tweet = driver.FindElement(By.CssSelector(".tweet"));
             IWebElement hashTag = tweet.FindElement(By.TagName("strong"));
             IWebElement teamHome = driver.FindElement(By.CssSelector(".team.home .teamName .long"));
             IWebElement teamAway = driver.FindElement(By.CssSelector(".team.away .teamName .long"));
             IWebElement score = driver.FindElement(By.CssSelector(".matchScoreContainer .centre .score"));
-
             IWebElement card = line.FindElement(By.CssSelector(".blogCard"));
+
             try
             {
                 IWebElement time = card.FindElement(By.CssSelector(".cardMeta time"));
@@ -93,14 +87,12 @@ namespace Cricarba.StoryTellerPL.Core
                                    $"{hashTag.Text} /n /n⚽ {teamHome.Text} {score.Text} {teamAway.Text} /n /n🕕 {timeMatch}  /n /n🎙️ {type.Text} {text.Text} /n /n#PremierLeague #PL";
 
             newTweet.Template = tweetTemplate.Replace("/n", Environment.NewLine);
-
             return newTweet;
         }
 
         private static int GetTime(string timeMatch)
         {
             int time;
-
             timeMatch = timeMatch.Replace("'", string.Empty);
             var timeSplit = timeMatch.Split('+');
             if (timeSplit.Length == 2)
@@ -117,7 +109,6 @@ namespace Cricarba.StoryTellerPL.Core
 
         private static List<string> GetPhotoMatch(IWebDriver driver)
         {
-
             List<string> urls = new List<string>();
             try
             {
@@ -137,15 +128,12 @@ namespace Cricarba.StoryTellerPL.Core
                             }
                         }
                         staleElement = false;
-
                     }
                     catch (StaleElementReferenceException e)
                     {
                         staleElement = !urls.Any();
                     }
                 }
-
-
             }
             catch (Exception ex)
             {

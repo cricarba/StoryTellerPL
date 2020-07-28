@@ -62,7 +62,6 @@ namespace Cricarba.StoryTellerPL
                 }
                 Thread.Sleep(isHalfTime ? 1020000 : 30000);
             }
-
             Console.WriteLine("Fin Partido");
         }
     }
