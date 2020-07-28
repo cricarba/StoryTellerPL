@@ -1,15 +1,9 @@
 ﻿using Cricarba.StoryTellerPL.Core;
 using Cricarba.StoryTellerPL.Dto;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
-using Tweetinvi;
-using Tweetinvi.Models;
-using Tweetinvi.Parameters;
 
 namespace Cricarba.StoryTellerPL
 {
@@ -27,13 +21,12 @@ namespace Cricarba.StoryTellerPL
         {
             List<string> previousTweets = new List<string>();
             bool isEndTime = false;
-            bool isHalfTime = false;
-
             PremierLeague premierLeague = new PremierLeague();
             TwiteerAuth twitAuthenticate = new TwiteerAuth();
             Twitter twitter = new Twitter(twitAuthenticate);
             while (!isEndTime)
             {
+                bool isHalfTime = false;
                 List<TweetST> tweets = premierLeague.GetTweets(id).ToList();
                 foreach (var tweetTemplate in tweets.OrderBy(x => x.Time))
                 {
@@ -72,8 +65,5 @@ namespace Cricarba.StoryTellerPL
 
             Console.WriteLine("Fin Partido");
         }
-
-
-
     }
 }
