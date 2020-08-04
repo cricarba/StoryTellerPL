@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Cricarba.StoryTellerPL.Dto;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
@@ -12,7 +10,8 @@ namespace Cricarba.StoryTellerPL.Core
 {
     internal class PremierLeagueScrapper
     {
-        List<string> previousPhotos = new List<string>();
+        private List<string> previousPhotos = new List<string>();
+
         public IEnumerable<TweetST> GetTweets(int matchId)
         {
             List<TweetST> template = new List<TweetST>();
@@ -26,7 +25,6 @@ namespace Cricarba.StoryTellerPL.Core
                 Thread.Sleep(5000);
                 IWebElement element = driver.FindElement(By.CssSelector(".commentaryContainer"));
                 IReadOnlyCollection<IWebElement> links = element.FindElements(By.TagName("li"));
-
 
                 List<string> photos = GetPhotoMatch(driver);
                 if (links.Any())
@@ -59,9 +57,9 @@ namespace Cricarba.StoryTellerPL.Core
             }
             return template;
         }
+
         private static TweetST CreateTemplate(IWebElement line, IWebDriver driver)
         {
-
             string timeMatch = "--";
             TweetST newTweet = new TweetST();
 
@@ -95,6 +93,7 @@ namespace Cricarba.StoryTellerPL.Core
 
             return newTweet;
         }
+
         private static int GetTime(string timeMatch)
         {
             int time;
@@ -112,9 +111,9 @@ namespace Cricarba.StoryTellerPL.Core
 
             return time;
         }
+
         private static List<string> GetPhotoMatch(IWebDriver driver)
         {
-
             List<string> urls = new List<string>();
             try
             {
@@ -134,15 +133,12 @@ namespace Cricarba.StoryTellerPL.Core
                             }
                         }
                         staleElement = false;
-
                     }
                     catch (StaleElementReferenceException e)
                     {
                         staleElement = !urls.Any();
                     }
                 }
-
-
             }
             catch (Exception ex)
             {
@@ -154,4 +150,3 @@ namespace Cricarba.StoryTellerPL.Core
         }
     }
 }
-

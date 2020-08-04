@@ -210,7 +210,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AuthTwitter.cs" />
     <Compile Include="Core\Secrets.cs" />
     <Compile Include="Core\Twitter.cs" />
     <Compile Include="Core\PremierLeagueScrapper.cs" />

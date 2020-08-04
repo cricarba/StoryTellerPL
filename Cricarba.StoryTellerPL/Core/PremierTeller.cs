@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Cricarba.StoryTellerPL.Dto;
 using System.Threading;
-
+using Cricarba.StoryTellerPL.Dto;
 
 namespace Cricarba.StoryTellerPL.Core
 {
@@ -58,6 +57,5 @@ namespace Cricarba.StoryTellerPL.Core
 
             Console.Write("\n Fin Partido");
         }
-
     }
 }

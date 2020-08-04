@@ -1,5 +1,4 @@
-﻿
-namespace Cricarba.StoryTellerPL.Dto
+﻿namespace Cricarba.StoryTellerPL.Dto
 {
     internal class TweetST
     {
@@ -7,7 +6,7 @@ namespace Cricarba.StoryTellerPL.Dto
         public int Time { get; set; }
         public bool HasImage { get; set; }
         public string Image { get; set; }
-        public bool  IsHalfTime { get { return Template.Contains("Half-time"); } }
-        public bool IsEndTime { get { return Template.Contains("Full-time")|| Template.Contains("Second Half ends"); } }
+        public bool IsHalfTime { get { return Template.Contains("Half-time"); } }
+        public bool IsEndTime { get { return Template.Contains("Full-time") || Template.Contains("Second Half ends"); } }
     }
 }

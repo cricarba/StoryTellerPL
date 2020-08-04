@@ -1,5 +1,4 @@
-﻿
-using Cricarba.StoryTellerPL.Scheduler;
+﻿using Cricarba.StoryTellerPL.Scheduler;
 
 namespace Cricarba.StoryTellerPL
 {

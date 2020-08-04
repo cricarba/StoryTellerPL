@@ -1,26 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Cricarba.StoryTellerPL.Core;
 using Hangfire;
 
 namespace Cricarba.Scheduler
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             GlobalConfiguration.Configuration
                   .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                   .UseColouredConsoleLogProvider()
                   .UseSimpleAssemblyNameTypeSerializer().UseSqlServerStorage(@"Data Source=CRICARBA;Initial Catalog=Hangfire;User ID=hangfire;Password=13beer88rojo;Application Name=MyApp");
             Shedule();
-
-
         }
-
 
         private static void Shedule()
         {
@@ -42,7 +35,6 @@ namespace Cricarba.Scheduler
                 Console.WriteLine("Agendado");
                 Console.WriteLine("Otro S/N");
                 other = Console.ReadLine() == "S";
-
             }
         }
     }

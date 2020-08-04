@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Cricarba.StoryTellerPL.Core;
 using Hangfire;
 using OpenQA.Selenium;
@@ -22,7 +19,7 @@ namespace Cricarba.StoryTellerPL.Scheduler
             Thread.Sleep(5000);
             IWebElement element = driver.FindElement(By.CssSelector(".fixtures"));
             IReadOnlyCollection<IWebElement> matchDays = driver.FindElements(By.CssSelector(".fixtures__matches-list"));
-           
+
             foreach (var day in matchDays)
             {
                 var date = day.GetAttribute("data-competition-matches-list");
@@ -36,7 +33,7 @@ namespace Cricarba.StoryTellerPL.Scheduler
 
                     IWebElement time = match.FindElement(By.TagName("time"));
                     var splitTime = time.Text.Split(':');
-                    if(splitTime.Length > 1)
+                    if (splitTime.Length > 1)
                     {
                         int.TryParse(splitTime[0], out int hour);
                         int.TryParse(splitTime[1], out int minute);
@@ -49,7 +46,6 @@ namespace Cricarba.StoryTellerPL.Scheduler
                         BackgroundJob.Schedule(() => PremierTeller.SummaryMatch(identifier),
                                  TimeSpan.FromMinutes(minutesDiff));
                     }
-                   
                 }
             }
         }
