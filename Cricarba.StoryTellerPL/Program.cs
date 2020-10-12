@@ -1,9 +1,9 @@
-﻿using Cricarba.StoryTellerPL.Core;
-using Cricarba.StoryTellerPL.Dto;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Cricarba.StoryTellerPL.Core;
+using Cricarba.StoryTellerPL.Dto;
 
 namespace Cricarba.StoryTellerPL
 {
@@ -26,7 +26,6 @@ namespace Cricarba.StoryTellerPL
             Twitter twitter = new Twitter(twitAuthenticate);
             while (!isEndTime)
             {
-                bool isHalfTime = false;
                 List<TweetST> tweets = premierLeague.GetTweets(id).ToList();
                 foreach (var tweetTemplate in tweets.OrderBy(x => x.Time))
                 {
@@ -53,16 +52,9 @@ namespace Cricarba.StoryTellerPL
                         isEndTime = true;
                         break;
                     }
-
-                    if (tweetTemplate.IsHalfTime)
-                    {
-                        isHalfTime = true;
-                        break;
-                    }
                 }
-                Thread.Sleep(isHalfTime ? 1020000 : 30000);
+                Thread.Sleep(60000);
             }
-
             Console.WriteLine("Fin Partido");
         }
     }
