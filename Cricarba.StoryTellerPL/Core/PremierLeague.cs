@@ -10,7 +10,8 @@ namespace Cricarba.StoryTellerPL.Core
 {
     internal class PremierLeague
     {
-        List<string> _previousPhotos = new List<string>();
+        private List<string> _previousPhotos = new List<string>();
+
         public IEnumerable<TweetST> GetTweets(int matchId)
         {
             List<TweetST> template = new List<TweetST>();
@@ -27,7 +28,7 @@ namespace Cricarba.StoryTellerPL.Core
                 List<string> photos = GetPhotoMatch(driver);
                 if (links.Any())
                 {
-                    int take = links.Count > 3 ? 3 : 1;
+                    int take = links.Count > 10 ? 10 : links.Count;
                     var lines = links.Take(take);
                     foreach (var item in lines)
                     {
@@ -145,4 +146,3 @@ namespace Cricarba.StoryTellerPL.Core
         }
     }
 }
-
