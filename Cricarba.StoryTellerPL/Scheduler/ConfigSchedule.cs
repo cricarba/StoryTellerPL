@@ -1,4 +1,5 @@
 ﻿using System;
+using Cricarba.StoryTellerPL.Core;
 using Hangfire;
 
 namespace Cricarba.StoryTellerPL.Scheduler
@@ -7,10 +8,12 @@ namespace Cricarba.StoryTellerPL.Scheduler
     {
         public ConfigSchedule()
         {
+            Secrets secrets = new Secrets();
+            string conn = secrets.GetSecrects("hangFireDb");
             GlobalConfiguration.Configuration
                    .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                    .UseColouredConsoleLogProvider()
-                   .UseSimpleAssemblyNameTypeSerializer().UseSqlServerStorage(@"Data Source=CRICARBA;Initial Catalog=Hangfire;User ID=hangfire;Password=13beer88rojo;Application Name=MyApp");
+                   .UseSimpleAssemblyNameTypeSerializer().UseSqlServerStorage(conn);
         }
 
         public void RunServer()

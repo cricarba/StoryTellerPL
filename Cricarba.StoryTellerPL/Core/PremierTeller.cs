@@ -12,7 +12,6 @@ namespace Cricarba.StoryTellerPL.Core
         {
             List<string> previousTweets = new List<string>();
             bool isEndTime = false;
-            bool isHalfTime = false;
 
             PremierLeagueScrapper premierLeague = new PremierLeagueScrapper();
             TwiteerAuth auth = new TwiteerAuth();
@@ -45,14 +44,8 @@ namespace Cricarba.StoryTellerPL.Core
                         isEndTime = true;
                         break;
                     }
-
-                    if (tweetTemplate.IsHalfTime)
-                    {
-                        isHalfTime = true;
-                        break;
-                    }
                 }
-                Thread.Sleep(isHalfTime ? 1200000 : 15000);
+                Thread.Sleep(TimeSpan.FromSeconds(30));
             }
 
             Console.Write("\n Fin Partido");

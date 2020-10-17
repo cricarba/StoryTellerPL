@@ -29,7 +29,7 @@ namespace Cricarba.StoryTellerPL.Core
                 List<string> photos = GetPhotoMatch(driver);
                 if (links.Any())
                 {
-                    int take = links.Count > 3 ? 3 : 1;
+                    int take = links.Count > 10 ? 10 : links.Count;
                     var lines = links.Take(take);
                     foreach (var item in lines)
                     {
