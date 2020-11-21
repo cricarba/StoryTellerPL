@@ -8,7 +8,7 @@ namespace Cricarba.Scheduler
     {
         private static void Main(string[] args)
         {
-            Secrets secrets = new Secrets();
+            var secrets = new Secrets();
             string conn = secrets.GetSecrects("hangFireDb");
 
             GlobalConfiguration.Configuration
