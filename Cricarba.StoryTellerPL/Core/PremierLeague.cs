@@ -16,7 +16,8 @@ namespace Cricarba.StoryTellerPL.Core
         {
             List<TweetST> template = new List<TweetST>();
             IWebDriver driver;
-            var chromeDriver = @"C:\Users\Freddy Castelblanco\Documents\Archivos\Proyectos\StoryTellerPL\Cricarba.StoryTellerPL\";
+            Secrets secrets = new Secrets();
+            var chromeDriver = secrets.GetSecrects("chromeDriver");
             driver = new ChromeDriver(chromeDriver);
             try
             {
