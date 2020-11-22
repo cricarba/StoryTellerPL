@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Tweetinvi;
 using Tweetinvi.Models;
 using Tweetinvi.Parameters;
@@ -13,10 +10,12 @@ namespace Cricarba.StoryTellerPL.Core
     public class Twitter
     {
         private TwiteerAuth _twitAuthenticate;
+
         public Twitter(TwiteerAuth twitAuthenticate)
         {
             _twitAuthenticate = twitAuthenticate;
         }
+
         public void TweetImage(string url, string tweetTemplate)
         {
             try
@@ -43,7 +42,6 @@ namespace Cricarba.StoryTellerPL.Core
                     {
                         Medias = new List<IMedia> { media }
                     });
-
                 }
                 webResponse.Close();
             }
