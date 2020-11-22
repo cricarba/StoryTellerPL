@@ -5,18 +5,20 @@ using System.Threading;
 using Cricarba.StoryTellerPL.Dto;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using Cricarba.StoryTellerPL.Core;
 
 namespace Cricarba.StoryTellerPL.Core
 {
-    internal class PremierLeague
+    internal class PremierLeagueScrapper
     {
-        private List<string> _previousPhotos = new List<string>();
+        private List<string> previousPhotos = new List<string>();
 
         public IEnumerable<TweetST> GetTweets(int matchId)
         {
             List<TweetST> template = new List<TweetST>();
             IWebDriver driver;
-            var chromeDriver = @"C:\Users\Freddy Castelblanco\Documents\Archivos\Proyectos\StoryTellerPL\Cricarba.StoryTellerPL\";
+            Secrets secrets = new Secrets();
+            var chromeDriver = secrets.GetSecrects("chromeDriver");
             driver = new ChromeDriver(chromeDriver);
             try
             {
@@ -28,18 +30,18 @@ namespace Cricarba.StoryTellerPL.Core
                 List<string> photos = GetPhotoMatch(driver);
                 if (links.Any())
                 {
-                    int take = links.Count > 10 ? 10 : links.Count;
+                    int take = links.Count > 3 ? 3 : 1;
                     var lines = links.Take(take);
                     foreach (var item in lines)
                     {
                         var newTweet = CreateTemplate(item, driver);
                         foreach (var photo in photos)
                         {
-                            if (!_previousPhotos.Contains(photo))
+                            if (!previousPhotos.Contains(photo))
                             {
                                 newTweet.HasImage = true;
                                 newTweet.Image = photo;
-                                _previousPhotos.Add(photo);
+                                previousPhotos.Add(photo);
                                 break;
                             }
                         }
