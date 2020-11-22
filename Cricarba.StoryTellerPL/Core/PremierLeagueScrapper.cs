@@ -5,7 +5,7 @@ using System.Threading;
 using Cricarba.StoryTellerPL.Dto;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using Cricarba.StoryTellerPL.Core;
+
 
 namespace Cricarba.StoryTellerPL.Core
 {
@@ -47,7 +47,6 @@ namespace Cricarba.StoryTellerPL.Core
                         }
                         template.Add(newTweet);
                     }
-                    driver.Close();
                 }
             }
             catch (Exception ex)
@@ -56,44 +55,67 @@ namespace Cricarba.StoryTellerPL.Core
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.Write(ex.Message);
             }
+            finally
+            {
+                driver.Close();
+            }
             return template;
         }
 
         private static TweetST CreateTemplate(IWebElement line, IWebDriver driver)
         {
-            string timeMatch = "--";
             TweetST newTweet = new TweetST();
-            IWebElement tweet = driver.FindElement(By.CssSelector(".tweet"));
-            IWebElement hashTag = tweet.FindElement(By.TagName("strong"));
-            IWebElement teamHome = driver.FindElement(By.CssSelector(".team.home .teamName .long"));
-            IWebElement teamAway = driver.FindElement(By.CssSelector(".team.away .teamName .long"));
-            IWebElement score = driver.FindElement(By.CssSelector(".matchScoreContainer .centre .score"));
-            IWebElement card = line.FindElement(By.CssSelector(".blogCard"));
+            try
+            {
 
+
+                IWebElement tweet = driver.FindElement(By.CssSelector(".tweet"));
+                IWebElement hashTag = tweet.FindElement(By.TagName("strong"));
+                IWebElement teamHome = driver.FindElement(By.CssSelector(".team.home .teamName .long"));
+                IWebElement teamAway = driver.FindElement(By.CssSelector(".team.away .teamName .long"));
+                IWebElement score = driver.FindElement(By.CssSelector(".matchScoreContainer .centre .score"));
+                IWebElement card = line.FindElement(By.CssSelector(".blogCard"));
+                string timeMatch = GetTime(newTweet, card);
+
+                IWebElement cardContent = card.FindElement(By.CssSelector(".cardContent"));
+                IWebElement innerContent = cardContent.FindElement(By.CssSelector(".innerContent"));
+                IWebElement type = innerContent.FindElement(By.TagName("h6"));
+                IWebElement text = innerContent.FindElement(By.TagName("p"));
+
+                string tweetTemplate = string.IsNullOrEmpty(type.Text) ?
+                                       $"{hashTag.Text} /n /n⚽ {teamHome.Text} {score.Text} {teamAway.Text} /n /n🕕 {timeMatch}  /n /n🎙️ {text.Text} /n /n#PremierLeague #PL" :
+                                       $"{hashTag.Text} /n /n⚽ {teamHome.Text} {score.Text} {teamAway.Text} /n /n🕕 {timeMatch}  /n /n🎙️ {type.Text} {text.Text} /n /n#PremierLeague #PL";
+
+                newTweet.Template = tweetTemplate.Replace("/n", Environment.NewLine);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write(ex.Message);
+                driver.Close();       
+            }
+            return newTweet;
+        }
+
+        private static string GetTime(TweetST newTweet, IWebElement card)
+        {
+            string timeMatch = "🏁";
             try
             {
                 IWebElement time = card.FindElement(By.CssSelector(".cardMeta time"));
                 timeMatch = time.Text;
-                newTweet.Time = GetTime(timeMatch);
+                newTweet.Time = GetNormalTime(timeMatch);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write(ex.Message);
             }
 
-            IWebElement cardContent = card.FindElement(By.CssSelector(".cardContent"));
-            IWebElement innerContent = cardContent.FindElement(By.CssSelector(".innerContent"));
-            IWebElement type = innerContent.FindElement(By.TagName("h6"));
-            IWebElement text = innerContent.FindElement(By.TagName("p"));
-
-            string tweetTemplate = string.IsNullOrEmpty(type.Text) ?
-                                   $"{hashTag.Text} /n /n⚽ {teamHome.Text} {score.Text} {teamAway.Text} /n /n🕕 {timeMatch}  /n /n🎙️ {text.Text} /n /n#PremierLeague #PL" :
-                                   $"{hashTag.Text} /n /n⚽ {teamHome.Text} {score.Text} {teamAway.Text} /n /n🕕 {timeMatch}  /n /n🎙️ {type.Text} {text.Text} /n /n#PremierLeague #PL";
-
-            newTweet.Template = tweetTemplate.Replace("/n", Environment.NewLine);
-            return newTweet;
+            return timeMatch;
         }
 
-        private static int GetTime(string timeMatch)
+        private static int GetNormalTime(string timeMatch)
         {
             int time;
             timeMatch = timeMatch.Replace("'", string.Empty);
