@@ -21,13 +21,9 @@ namespace Cricarba.StoryTellerPL.Core
                          }
             };
 
-            string keyVaultName = Environment.GetEnvironmentVariable("KEY_VAULT_NAME");
-            var kvUri = "https://" + keyVaultName + ".vault.azure.net";
-
+            var kvUri = $"https://{Environment.GetEnvironmentVariable("KEY_VAULT_NAME")}.vault.azure.net";
             var client = new SecretClient(new Uri(kvUri), new DefaultAzureCredential(), options);
-
             KeyVaultSecret secret = client.GetSecret(name);
-
             return secret.Value;
         }
     }
