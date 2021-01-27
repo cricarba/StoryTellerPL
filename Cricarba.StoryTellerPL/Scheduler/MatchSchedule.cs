@@ -13,7 +13,7 @@ namespace Cricarba.StoryTellerPL.Scheduler
         public void ScheduleMatch()
         {
             IWebDriver driver;
-            var chromeDriver = @"C:\Users\Freddy Castelblanco\Documents\Archivos\Proyectos\StoryTellerPL\Cricarba.StoryTellerPL\";
+            var chromeDriver = new Secrets().GetSecrects("chromeDriver");
             driver = new ChromeDriver(chromeDriver);
             driver.Url = $"https://www.premierleague.com/fixtures";
             Thread.Sleep(5000);
