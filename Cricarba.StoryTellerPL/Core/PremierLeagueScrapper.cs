@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -6,12 +6,11 @@ using Cricarba.StoryTellerPL.Dto;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 
-
 namespace Cricarba.StoryTellerPL.Core
 {
     internal class PremierLeagueScrapper
     {
-        private List<string> previousPhotos = new List<string>();
+        //private List<string> previousPhotos = new List<string>();
 
         public IEnumerable<TweetST> GetTweets(int matchId)
         {
@@ -27,7 +26,7 @@ namespace Cricarba.StoryTellerPL.Core
                 IWebElement element = driver.FindElement(By.CssSelector(".commentaryContainer"));
                 IReadOnlyCollection<IWebElement> links = element.FindElements(By.TagName("li"));
 
-                List<string> photos = GetPhotoMatch(driver);
+                //List<string> photos = GetPhotoMatch(driver);
                 if (links.Any())
                 {
                     int take = links.Count > 3 ? 3 : 1;
@@ -35,16 +34,16 @@ namespace Cricarba.StoryTellerPL.Core
                     foreach (var item in lines)
                     {
                         var newTweet = CreateTemplate(item, driver);
-                        foreach (var photo in photos)
-                        {
-                            if (!previousPhotos.Contains(photo))
-                            {
-                                newTweet.HasImage = true;
-                                newTweet.Image = photo;
-                                previousPhotos.Add(photo);
-                                break;
-                            }
-                        }
+                        //foreach (var photo in photos)
+                        //{
+                        //    if (!previousPhotos.Contains(photo))
+                        //    {
+                        //        newTweet.HasImage = true;
+                        //        newTweet.Image = photo;
+                        //        previousPhotos.Add(photo);
+                        //        break;
+                        //    }
+                        //}
                         template.Add(newTweet);
                     }
                 }
@@ -115,22 +114,6 @@ namespace Cricarba.StoryTellerPL.Core
             return timeMatch;
         }
 
-        private static int GetNormalTime(string timeMatch)
-        {
-            int time;
-            timeMatch = timeMatch.Replace("'", string.Empty);
-            var timeSplit = timeMatch.Split('+');
-            if (timeSplit.Length == 2)
-            {
-                int.TryParse(timeSplit[0], out int normalTime);
-                int.TryParse(timeSplit[1], out int extraTime);
-                time = normalTime + extraTime;
-            }
-            else
-                int.TryParse(timeMatch, out time);
-
-            return time;
-        }
 
         private static List<string> GetPhotoMatch(IWebDriver driver)
         {
@@ -167,6 +150,23 @@ namespace Cricarba.StoryTellerPL.Core
                 driver.Close();
             }
             return urls;
+        }
+
+        private static int GetTime(string timeMatch)
+        {
+            int time;
+            timeMatch = timeMatch.Replace("'", string.Empty);
+            var timeSplit = timeMatch.Split('+');
+            if (timeSplit.Length == 2)
+            {
+                int.TryParse(timeSplit[0], out int normalTime);
+                int.TryParse(timeSplit[1], out int extraTime);
+                time = normalTime + extraTime;
+            }
+            else
+                int.TryParse(timeMatch, out time);
+
+            return time;
         }
     }
 }

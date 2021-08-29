@@ -30,11 +30,11 @@ namespace Cricarba.Scheduler
                 int.TryParse(id, out int idMatch);
 
                 double.TryParse(minutos, out double timeToMatch);
-                Console.WriteLine($"Agendando para {timeToMatch} minutos");
+                Console.WriteLine($"Agendando para {timeToMatch} minutos...");
                 BackgroundJob.Schedule(() => PremierTeller.SummaryMatch(idMatch), TimeSpan.FromMinutes(timeToMatch));
                 Console.WriteLine("Agendado...");
                 Console.WriteLine("Agendar Otro S/N?");
-                other = Console.ReadLine() == "S";
+                other = Console.ReadLine().ToLower() == "s";
             }
         }
     }
