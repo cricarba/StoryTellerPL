@@ -25,11 +25,19 @@ namespace Cricarba.Scheduler
             {
                 Console.WriteLine("Partido:");
                 var id = Console.ReadLine();
-                Console.WriteLine("Minutos que faltan para el incio del partido:");
-                var minutos = Console.ReadLine();
                 int.TryParse(id, out int idMatch);
 
+                Console.WriteLine("Horas que faltan para el incio del partido:");
+                var horas = Console.ReadLine();
+                int.TryParse(horas, out int hour);
+                hour = hour * 60;
+
+                Console.WriteLine("Minutos que faltan para el incio del partido:");
+                var minutos = Console.ReadLine();
                 double.TryParse(minutos, out double timeToMatch);
+                timeToMatch = timeToMatch + hour;
+
+
                 Console.WriteLine($"Agendando para {timeToMatch} minutos...");
                 BackgroundJob.Schedule(() => PremierTeller.SummaryMatch(idMatch), TimeSpan.FromMinutes(timeToMatch));
                 Console.WriteLine("Agendado...");
