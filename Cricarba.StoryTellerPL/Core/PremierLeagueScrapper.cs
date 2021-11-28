@@ -19,9 +19,16 @@ namespace Cricarba.StoryTellerPL.Core
             IWebDriver driver;
             Secrets secrets = new Secrets();
             var chromeDriver = secrets.GetSecrects("chromeDriver");
-            driver = new ChromeDriver(chromeDriver);
+
+            ChromeOptions option = new ChromeOptions();
+            ChromeDriverService service = ChromeDriverService.CreateDefaultService(chromeDriver);          
+            service.HideCommandPromptWindow = true;
+            driver = new ChromeDriver(service, option);
+            driver.Manage().Window.Minimize();
+
             try
             {
+                
                 driver.Url = $"https://www.premierleague.com/match/{matchId}";
                 Thread.Sleep(5000);
                 IWebElement element = driver.FindElement(By.CssSelector(".commentaryContainer"));
