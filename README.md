@@ -16,3 +16,17 @@ En este proyecto podras encontrar lo siguiente:
 - WebScrapy con sellenium. 
 - Azure Key Vault
 - Hingfire Scheduler
+
+Crear varible de entorno para saber de donde tomar los datos de configuración
+
+- SECRETS_LOCAL = indica si las variables de configuración se toma de las variables de entonrno locales o de Azure Secrets, True para variables locales
+
+Variables de entorno o Azure Secrets
+
+- hangFireDb = cadena de conexión para la base de datos del Scheduler
+- chromeDriver= ruta del driver de sellenium
+- oauthConsumerKey = Consumer Key de la cuenta de twitter
+- oauthConsumerSecret = Consumer Secret de la ceunta de twitter
+- oauthToken = token para autenticación de ña cuenta de twitter
+- oauthTokenSecret = secret token de la cuenta de twiiter
+
