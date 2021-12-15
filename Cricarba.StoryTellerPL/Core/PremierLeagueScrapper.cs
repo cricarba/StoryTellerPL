@@ -11,8 +11,6 @@ namespace Cricarba.StoryTellerPL.Core
 {
     internal class PremierLeagueScrapper
     {
-        //private List<string> previousPhotos = new List<string>();
-
         public IEnumerable<TweetST> GetTweets(int matchId)
         {
             List<TweetST> template = new List<TweetST>();
@@ -21,20 +19,19 @@ namespace Cricarba.StoryTellerPL.Core
             var chromeDriver = secrets.GetSecrects("chromeDriver");
 
             ChromeOptions option = new ChromeOptions();
-            ChromeDriverService service = ChromeDriverService.CreateDefaultService(chromeDriver);          
+            ChromeDriverService service = ChromeDriverService.CreateDefaultService(chromeDriver);
             service.HideCommandPromptWindow = true;
             driver = new ChromeDriver(service, option);
             driver.Manage().Window.Minimize();
 
             try
             {
-                
+
                 driver.Url = $"https://www.premierleague.com/match/{matchId}";
                 Thread.Sleep(5000);
                 IWebElement element = driver.FindElement(By.CssSelector(".commentaryContainer"));
                 IReadOnlyCollection<IWebElement> links = element.FindElements(By.TagName("li"));
 
-                //List<string> photos = GetPhotoMatch(driver);
                 if (links.Any())
                 {
                     int take = links.Count > 3 ? 3 : 1;
@@ -42,20 +39,20 @@ namespace Cricarba.StoryTellerPL.Core
                     foreach (var item in lines)
                     {
                         var newTweet = CreateTemplate(item, driver);
-                        //foreach (var photo in photos)
-                        //{
-                        //    if (!previousPhotos.Contains(photo))
-                        //    {
-                        //        newTweet.HasImage = true;
-                        //        newTweet.Image = photo;
-                        //        previousPhotos.Add(photo);
-                        //        break;
-                        //    }
-                        //}
+                        if (newTweet.IsEndTime || newTweet.IsHalfTime)
+                        {
+                            List<string> photos = GetPhotoMatch(driver);
+                            if (photos.Any())
+                            {
+                                newTweet.HasImage = true;
+                                newTweet.Image = photos.First();
+                            }
+                        }
                         template.Add(newTweet);
                     }
-                    driver.Close();
+
                 }
+
             }
             catch (Exception ex)
             {
@@ -63,6 +60,7 @@ namespace Cricarba.StoryTellerPL.Core
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.Write(ex.Message);
             }
+            driver.Close();
             return template;
         }
 
