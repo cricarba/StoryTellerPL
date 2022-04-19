@@ -56,11 +56,15 @@ namespace Cricarba.StoryTellerPL.Core
             }
             catch (Exception ex)
             {
-                driver.Close();
+
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.Write(ex.Message);
             }
-            driver.Close();
+            finally
+            {
+                driver.Close();
+            }
+
             return template;
         }
 
@@ -74,28 +78,34 @@ namespace Cricarba.StoryTellerPL.Core
             IWebElement teamAway = driver.FindElement(By.CssSelector(".team.away .teamName .long"));
             IWebElement score = driver.FindElement(By.CssSelector(".matchScoreContainer .centre .score"));
             IWebElement card = line.FindElement(By.CssSelector(".blogCard"));
+            string emptyText = card.Text;
 
             try
             {
                 IWebElement time = card.FindElement(By.CssSelector(".cardMeta time"));
                 timeMatch = time.Text;
                 newTweet.Time = GetTime(timeMatch);
+                IWebElement cardContent = card.FindElement(By.CssSelector(".cardContent"));                
+                IWebElement innerContent = cardContent.FindElement(By.CssSelector(".innerContent"));                            
+                IWebElement type = innerContent.FindElement(By.TagName("h6"));                          
+                IWebElement text = innerContent.FindElement(By.TagName("p"));
+            
+                emptyText = string.IsNullOrEmpty(text.Text) ? innerContent.Text : text.Text;
+                string tweetTemplate = string.IsNullOrEmpty(type.Text) ?
+                                       $"{hashTag.Text} /n /n⚽ {teamHome.Text} {score.Text} {teamAway.Text} /n /n🕕 {timeMatch}  /n /n🎙️ {emptyText} /n /n#PremierLeague #PL" :
+                                       $"{hashTag.Text} /n /n⚽ {teamHome.Text} {score.Text} {teamAway.Text} /n /n🕕 {timeMatch}  /n /n🎙️ {type.Text} {emptyText} /n /n#PremierLeague #PL";
+
+                newTweet.Template = tweetTemplate.Replace("/n", Environment.NewLine);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
+                newTweet.Template = emptyText;
+
             }
-
-            IWebElement cardContent = card.FindElement(By.CssSelector(".cardContent"));
-            IWebElement innerContent = cardContent.FindElement(By.CssSelector(".innerContent"));
-            IWebElement type = innerContent.FindElement(By.TagName("h6"));
-            IWebElement text = innerContent.FindElement(By.TagName("p"));
-
-            string tweetTemplate = string.IsNullOrEmpty(type.Text) ?
-                                   $"{hashTag.Text} /n /n⚽ {teamHome.Text} {score.Text} {teamAway.Text} /n /n🕕 {timeMatch}  /n /n🎙️ {text.Text} /n /n#PremierLeague #PL" :
-                                   $"{hashTag.Text} /n /n⚽ {teamHome.Text} {score.Text} {teamAway.Text} /n /n🕕 {timeMatch}  /n /n🎙️ {type.Text} {text.Text} /n /n#PremierLeague #PL";
-
-            newTweet.Template = tweetTemplate.Replace("/n", Environment.NewLine);
             return newTweet;
+
+
         }
 
         private static List<string> GetPhotoMatch(IWebDriver driver)

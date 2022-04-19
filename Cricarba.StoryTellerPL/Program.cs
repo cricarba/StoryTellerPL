@@ -1,4 +1,5 @@
-﻿using Cricarba.StoryTellerPL.Scheduler;
+﻿using Cricarba.StoryTellerPL.Core;
+using Cricarba.StoryTellerPL.Scheduler;
 
 namespace Cricarba.StoryTellerPL
 {
@@ -6,6 +7,7 @@ namespace Cricarba.StoryTellerPL
     {
         private static void Main(string[] args)
         {
+
             ConfigSchedule schedule = new ConfigSchedule();
             schedule.RunServer();
         }
